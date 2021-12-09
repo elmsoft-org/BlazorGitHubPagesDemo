@@ -24,9 +24,19 @@ jobs:
         #config-file: # optional
         # Whether prerelease versions should be matched with non-exact versions (for example 5.0.0-preview.6 being matched by 5, 5.0, 5.x or 5.0.x). Defaults to false if not provided.
         #include-prerelease: # optional
+    
     # publishes Blazor project to the release-folder
     - name: Publish .NET Core Project
       run: dotnet publish BlazorGitHubPagesDemo.csproj -c Release -o release --nologo        
+    
+    # changes the base-tag in index.html from '/' to 'https://elmsoft-org.github.io/BlazorGitHubPagesDemo/' to match GitHub Pages repository subdirectory
+    - name: Change base-tag in index.html from / to https://elmsoft-org.github.io/BlazorGitHubPagesDemo/
+      run: sed -i 's/<base href="\/" \/>/<base href="\/https://elmsoft-org.github.io/BlazorGitHubPagesDemo/\/" \/>/g' release/wwwroot/index.html
+    
+    # add .nojekyll file to tell GitHub pages to not treat this as a Jekyll project. (Allow files and folders starting with an underscore)
+    - name: Add .nojekyll file
+      run: touch release/wwwroot/.nojekyll
+      
     # Commit wwwroot to GitHub Pages
     - name: Commit wwwroot to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.7.1
